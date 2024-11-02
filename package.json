@@ -11,9 +11,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/express": "^5.0.0",
     "axios": "^1.7.7",
     "cron": "^3.1.7",
     "dayjs": "^1.11.13",
+    "express": "^4.21.1",
     "jsdom": "^25.0.1"
   },
   "devDependencies": {
