@@ -2,6 +2,7 @@ import axios from "axios";
 import { JSDOM } from "jsdom";
 import fs from "fs";
 import { CronJob } from "cron";
+import dayjs from "dayjs";
 interface TeamMember {
   league: string;
   team: string;
@@ -121,7 +122,7 @@ async function scrapeUrlToJson(url: string, id: string[]) {
     const response = await axios.get(url);
     const html = response.data;
 
-    console.log("Fetched VCT Contract Database content successfully");
+    Logger("Fetched VCT Contract Database content successfully");
 
     // Parse the HTML
     const dom = new JSDOM(html);
@@ -144,10 +145,10 @@ async function scrapeUrlToJson(url: string, id: string[]) {
 
       // Select all rows from the tbody
       const rows = table.querySelectorAll("tbody tr");
-      //   console.log(`Number of rows found ${rows.length} in ${Id[id]} Table`);
+      //   Logger(`Number of rows found ${rows.length} in ${Id[id]} Table`);
       const update = rows[0].querySelectorAll("td")[1].textContent;
       if (lastUpdate[Id[id]] === update) {
-        console.log("No new data found in", Id[id]);
+        Logger(`No new data found in ${Id[id]}`);
         return;
       } else {
         lastUpdate[Id[id]] = update;
@@ -177,11 +178,11 @@ async function scrapeUrlToJson(url: string, id: string[]) {
 
           teamMembers.push(teamMember);
         } else {
-          // console.log(`Skipping row ${index + 1} due to insufficient cells (found ${cells.length})`);
+          // Logger(`Skipping row ${index + 1} due to insufficient cells (found ${cells.length})`);
         }
       });
 
-      console.log(
+      Logger(
         `Total team members parsed: ${teamMembers.length} in ${Id[id]} Table`
       );
       compareAndLogChanges(
@@ -203,7 +204,11 @@ async function scrapeUrlToJson(url: string, id: string[]) {
 }
 
 function sendTweet(changeMessages: string) {
-  console.log(changeMessages);
+  Logger(changeMessages);
+}
+
+function Logger(log: string) {
+  console.log(`[${dayjs().format("HH:mm")}] - ${log}`);
 }
 // Example usage
 const url =
@@ -211,13 +216,13 @@ const url =
 
 let lastUpdate = JSON.parse(fs.readFileSync("lastUpdate.json", "utf-8"));
 const job = new CronJob("*/5 * * * *", async () => {
-  console.log("Scraping data and checking for updates...");
+  Logger(`Scraping data and checking for updates...`);
   try {
     lastUpdate = JSON.parse(fs.readFileSync("lastUpdate.json", "utf-8"));
 
     scrapeUrlToJson(url, id)
       .then(() => {
-        console.log("Scraping completed");
+        Logger("Scraping completed");
       })
       .catch((error) => console.error("Error:", error));
   } catch (error) {

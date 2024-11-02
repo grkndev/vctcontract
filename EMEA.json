@@ -1,7 +1,7 @@
 [
   {
     "league": "Last Update:",
-    "team": "10/10/2024",
+    "team": "01/11/2024",
     "handle": "",
     "role": "",
     "firstName": "",
@@ -561,6 +561,19 @@
   {
     "league": "EMEA",
     "team": "TEAM HERETICS",
+    "handle": "Boo",
+    "role": "PLAYER",
+    "firstName": "Ričardas",
+    "lastName": "Lukaševičius",
+    "contract": "2026",
+    "status": "Resident",
+    "activeStatus": "Active",
+    "teamCode": "TH",
+    "contactInfo": ""
+  },
+  {
+    "league": "EMEA",
+    "team": "TEAM HERETICS",
     "handle": "neilzinho",
     "role": "HEAD COACH",
     "firstName": "NEIL",
@@ -752,6 +765,32 @@
     "activeStatus": "",
     "teamCode": "M8",
     "contactInfo": "Samy Mazouzi <samishh@gentlemates.com>"
+  },
+  {
+    "league": "",
+    "team": "",
+    "handle": "",
+    "role": "",
+    "firstName": "",
+    "lastName": "",
+    "contract": "",
+    "status": "",
+    "activeStatus": "",
+    "teamCode": "",
+    "contactInfo": ""
+  },
+  {
+    "league": "EMEA",
+    "team": "Apeks",
+    "handle": "",
+    "role": "",
+    "firstName": "",
+    "lastName": "",
+    "contract": "",
+    "status": "",
+    "activeStatus": "",
+    "teamCode": "",
+    "contactInfo": ""
   },
   {
     "league": "",
