@@ -70,6 +70,17 @@ app.get("/region", (req, res) => {
     teams: response,
   });
 });
+app.get("/updates", (req, res) => {
+  //retrun the local file updates.json
+  let rawData;
+  try {
+    rawData = fs.readFileSync(`./updates.json`, "utf8");
+  } catch (err) {
+    return res.status(404).json({ error: "Updates not found" });
+  }
+  const data = JSON.parse(rawData);
+  return res.json(data);
+});
 
 app.listen(3000, () => {
   console.log("Server is running on http://localhost:3000");
