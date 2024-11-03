@@ -189,7 +189,7 @@ async function scrapeUrlToJson(url: string, id: string[]) {
         teamMembers,
         JSON.parse(fs.readFileSync(`${Id[id]}.json`, "utf-8"))
       ).forEach((message) => {
-        sendTweet(message);
+        sendTweet(message, id);
       });
 
       fs.writeFileSync(`${Id[id]}.json`, JSON.stringify(teamMembers, null, 2));
@@ -203,12 +203,27 @@ async function scrapeUrlToJson(url: string, id: string[]) {
   }
 }
 
-function sendTweet(changeMessages: string) {
+function sendTweet(changeMessages: string, regionIndex?: string) {
+  fs.appendFileSync(
+    "updates.json", // "update.json" yerine "updates.json" olmalı
+    JSON.stringify(
+      {
+        date: Date.now(),
+        message: changeMessages.replace(/\s*\([^)]*\)\s*/g, ""),
+        team: changeMessages.split("(")[1]?.split(")")?.at(0) || "",
+        region: `${regionIndex ? Id[regionIndex] : "ALL"}`,
+      },
+      null,
+      2
+    ) +
+      "," +
+      "\n" // Her kayıt için virgül ve yeni satır eklenmeli
+  );
   Logger(changeMessages);
 }
 
 function Logger(log: string) {
-  console.log(`[${dayjs().format("HH:mm")}] - ${log}`);
+  console.log(`[${dayjs().format("d MMM YYYY HH:mm")}] - ${log}`);
 }
 // Example usage
 const url =
