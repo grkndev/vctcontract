@@ -223,7 +223,7 @@ function sendTweet(changeMessages: string, regionIndex?: string) {
 }
 
 function Logger(log: string) {
-  console.log(`[${dayjs().format("d MMM YYYY HH:mm")}] - ${log}`);
+  console.log(`[${dayjs().format("dd MMM YYYY HH:mm")}] - ${log}`);
 }
 // Example usage
 const url =
