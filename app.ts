@@ -3,6 +3,7 @@ import { JSDOM } from "jsdom";
 import fs from "fs";
 import { CronJob } from "cron";
 import dayjs from "dayjs";
+
 interface TeamMember {
   league: string;
   team: string;
@@ -204,26 +205,32 @@ async function scrapeUrlToJson(url: string, id: string[]) {
 }
 
 function sendTweet(changeMessages: string, regionIndex?: string) {
-  fs.appendFileSync(
-    "updates.json", // "update.json" yerine "updates.json" olmalı
-    JSON.stringify(
-      {
-        date: Date.now(),
-        message: changeMessages.replace(/\s*\([^)]*\)\s*/g, ""),
-        team: changeMessages.split("(")[1]?.split(")")?.at(0) || "",
-        region: `${regionIndex ? Id[regionIndex] : "ALL"}`,
-      },
-      null,
-      2
-    ) +
-      "," +
-      "\n" // Her kayıt için virgül ve yeni satır eklenmeli
-  );
+  const oldFile = fs.readFileSync("lastUpdate.json", "utf-8");
+  const oldData = JSON.parse(oldFile);
+  const teamName = changeMessages.split("(")[1]?.split(")")?.at(0) || null;
+  (oldData as any[]).push({
+    date: Date.now(),
+    message: changeMessages.replace(/\s*\([^)]*\)\s*/g, ""),
+    team: teamName || "",
+    region: `${regionIndex ? Id[regionIndex] : "ALL"}`,
+  });
+  fs.writeFileSync("lastUpdate.json", JSON.stringify(oldData, null, 2));
+  fetch("https://exp.host/--/api/v2/push/send", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      to: "ExponentPushToken[K-ylnFPmdqec33KmXmz8QE]",
+      title: `VCT Contract Update ${teamName ? `- ${teamName}` : ""}`,
+      body: changeMessages.replace(/\s*\([^)]*\)\s*/g, ""),
+    }),
+  });
   Logger(changeMessages);
 }
 
 function Logger(log: string) {
-  console.log(`[${dayjs().format("dd MMM YYYY HH:mm")}] - ${log}`);
+  console.log(`[${dayjs().format("D MMM YYYY HH:mm")}] - ${log}`);
 }
 // Example usage
 const url =
