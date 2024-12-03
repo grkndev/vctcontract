@@ -205,28 +205,45 @@ async function scrapeUrlToJson(url: string, id: string[]) {
 }
 
 function sendTweet(changeMessages: string, regionIndex?: string) {
-  const oldFile = fs.readFileSync("lastUpdate.json", "utf-8");
-  const oldData = JSON.parse(oldFile);
-  const teamName = changeMessages.split("(")[1]?.split(")")?.at(0) || null;
-  (oldData as any[]).push({
-    date: Date.now(),
-    message: changeMessages.replace(/\s*\([^)]*\)\s*/g, ""),
-    team: teamName || "",
-    region: `${regionIndex ? Id[regionIndex] : "ALL"}`,
-  });
-  fs.writeFileSync("lastUpdate.json", JSON.stringify(oldData, null, 2));
+  try {
+    const oldFile = fs.readFileSync("lastUpdate.json", "utf-8");
+    const oldData = JSON.parse(oldFile);
+    const teamName = changeMessages.split("(")[1]?.split(")")?.at(0) || null;
+    (oldData as any[]).push({
+      date: Date.now(),
+      message: changeMessages.replace(/\s*\([^)]*\)\s*/g, " "),
+      team: teamName || "",
+      region: `${regionIndex ? Id[regionIndex] : "ALL"}`,
+    });
+    fs.writeFileSync("lastUpdate.json", JSON.stringify(oldData, null, 2));
+    fetch("https://exp.host/--/api/v2/push/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        to: "ExponentPushToken[2vH8aqNUGlIytRgV3MY9zM]",
+        title: `VCT Contract Update ${teamName ? `- ${teamName}` : ""}`,
+        body: changeMessages.replace(/\s*\([^)]*\)\s*/g, ""),
+      }),
+    });
+    Logger(changeMessages);
+  } catch (error: any) {
+    handleError(error.message);
+  }
+}
+function handleError(msg: string) {
   fetch("https://exp.host/--/api/v2/push/send", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      to: "ExponentPushToken[K-ylnFPmdqec33KmXmz8QE]",
-      title: `VCT Contract Update ${teamName ? `- ${teamName}` : ""}`,
-      body: changeMessages.replace(/\s*\([^)]*\)\s*/g, ""),
+      to: "ExponentPushToken[2vH8aqNUGlIytRgV3MY9zM]",
+      title: `VCT Contract Update Error`,
+      body: `Error Message: ${msg}`,
     }),
   });
-  Logger(changeMessages);
 }
 
 function Logger(log: string) {
@@ -254,4 +271,5 @@ const job = new CronJob("*/5 * * * *", async () => {
     }
   }
 });
+
 job.start();
