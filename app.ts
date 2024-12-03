@@ -207,14 +207,21 @@ async function scrapeUrlToJson(url: string, id: string[]) {
 function sendTweet(changeMessages: string, regionIndex?: string) {
   try {
     const oldFile = fs.readFileSync("lastUpdate.json", "utf-8");
-    const oldData = JSON.parse(oldFile);
+    const oldData = JSON.parse(oldFile) || [];
     const teamName = changeMessages.split("(")[1]?.split(")")?.at(0) || null;
-    (oldData as any[]).push({
+    
+    // Ensure oldData is an array before pushing
+    if (!Array.isArray(oldData)) {
+      throw new Error("Invalid data format in lastUpdate.json");
+    }
+
+    oldData.push({
       date: Date.now(),
       message: changeMessages.replace(/\s*\([^)]*\)\s*/g, " "),
       team: teamName || "",
       region: `${regionIndex ? Id[regionIndex] : "ALL"}`,
     });
+    
     fs.writeFileSync("lastUpdate.json", JSON.stringify(oldData, null, 2));
     fetch("https://exp.host/--/api/v2/push/send", {
       method: "POST",
@@ -271,5 +278,4 @@ const job = new CronJob("*/5 * * * *", async () => {
     }
   }
 });
-
 job.start();
