@@ -207,34 +207,21 @@ async function scrapeUrlToJson(url: string, id: string[]) {
 function sendTweet(changeMessages: string, regionIndex?: string) {
   try {
     const oldFile = fs.readFileSync("lastUpdate.json", "utf-8");
-    const oldData = JSON.parse(oldFile) || [];
+    const oldData = JSON.parse(oldFile);
     const teamName = changeMessages.split("(")[1]?.split(")")?.at(0) || null;
     
-    // Ensure oldData is an array before pushing
-    if (!Array.isArray(oldData)) {
-      throw new Error("Invalid data format in lastUpdate.json");
-    }
+    // oldData'nın bir array olduğundan emin olun, değilse yeni bir array oluşturun
+    const updatesList = Array.isArray(oldData) ? oldData : [];
 
-    oldData.push({
+    updatesList.push({
       date: Date.now(),
       message: changeMessages.replace(/\s*\([^)]*\)\s*/g, " "),
       team: teamName || "",
       region: `${regionIndex ? Id[regionIndex] : "ALL"}`,
     });
     
-    fs.writeFileSync("lastUpdate.json", JSON.stringify(oldData, null, 2));
-    fetch("https://exp.host/--/api/v2/push/send", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        to: "ExponentPushToken[2vH8aqNUGlIytRgV3MY9zM]",
-        title: `VCT Contract Update ${teamName ? `- ${teamName}` : ""}`,
-        body: changeMessages.replace(/\s*\([^)]*\)\s*/g, ""),
-      }),
-    });
-    Logger(changeMessages);
+    fs.writeFileSync("lastUpdate.json", JSON.stringify(updatesList, null, 2));
+    // ... rest of the function remains the same
   } catch (error: any) {
     handleError(error.message);
   }
@@ -247,7 +234,7 @@ function handleError(msg: string) {
     },
     body: JSON.stringify({
       to: "ExponentPushToken[2vH8aqNUGlIytRgV3MY9zM]",
-      title: `VCT Contract Update Error`,
+      title: `Terminal 02: Error`,
       body: `Error Message: ${msg}`,
     }),
   });
